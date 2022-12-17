@@ -19,5 +19,5 @@ public class Address {
     private String city;
 
     @Column(name = "street")
-    private String Street;
+    private String street;
 }

@@ -37,6 +37,10 @@ public class User {
 //    private Role role;
 
     @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User manager;
+
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_details_id")
     private UserDetails userDetails;
 

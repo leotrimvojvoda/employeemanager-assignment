@@ -2,13 +2,14 @@ package com.elba.employeemanager.services;
 
 import com.elba.employeemanager.common.Base64ToFile;
 import com.elba.employeemanager.common.DateUtilities;
+import com.elba.employeemanager.common.ResponseObject;
 import com.elba.employeemanager.entities.Address;
 import com.elba.employeemanager.entities.Department;
 import com.elba.employeemanager.entities.User;
 import com.elba.employeemanager.entities.UserDetails;
 import com.elba.employeemanager.enums.UserState;
+import com.elba.employeemanager.models.ViewUser;
 import com.elba.employeemanager.models.XlsxDto;
-import com.elba.employeemanager.repositories.UserDetailsRepository;
 import com.elba.employeemanager.repositories.UserRepository;
 import com.poiji.bind.Poiji;
 import org.springframework.http.HttpStatus;
@@ -25,28 +26,26 @@ public class EmployeeService {
 
     private final Base64ToFile base64ToFile;
     private final UserRepository userRepository;
-
-    private DateUtilities dateUtilities;
-    private final UserDetailsRepository userDetailsRepository;
+    private final DateUtilities dateUtilities;
 
     public EmployeeService(Base64ToFile base64ToFile, UserRepository userRepository,
-                           UserDetailsRepository userDetailsRepository) {
+                           DateUtilities dateUtilities) {
         this.base64ToFile = base64ToFile;
         this.userRepository = userRepository;
-        this.userDetailsRepository = userDetailsRepository;
+        this.dateUtilities = dateUtilities;
     }
 
     public ResponseEntity<?> saveEmployees(String xlsxFile) {
 
         File file = base64ToFile.getFile(xlsxFile, "employees.xlsx");
 
-        try{
+        try {
 
             List<XlsxDto> xlsxData = Poiji.fromExcel(file, XlsxDto.class);
 
             List<User> users = new ArrayList<>();
 
-            for(XlsxDto employee : xlsxData){
+            for (XlsxDto employee : xlsxData) {
                 User user = new User();
                 user.setFirstName(employee.getFullName().split(" ")[0]);
                 user.setLastName(employee.getFullName().split(" ")[1]);
@@ -67,7 +66,7 @@ public class EmployeeService {
                 department.setDepartmentName(employee.getDepartmentName());
                 department.setDepartmentPhoneNumber(employee.getDepartmentPhone());
 
-                if(dateUtilities.getDate(employee.getEndDate()).isBefore(LocalDate.now()))
+                if (dateUtilities.getDate(employee.getEndDate()).isBefore(LocalDate.now()))
                     user.setState(UserState.INACTIVE);
 
                 userDetails.setAddress(address);
@@ -78,7 +77,6 @@ public class EmployeeService {
             }
 
             userRepository.saveAll(users);
-
 
         } catch (Exception e) {
             System.out.println("Error while parsing file");
@@ -91,4 +89,19 @@ public class EmployeeService {
 
     }
 
+    public ResponseObject search(String search) {
+
+        ResponseObject responseObject = new ResponseObject<>();
+        responseObject.prepareHttpStatus(HttpStatus.BAD_REQUEST);
+
+        try {
+            List<ViewUser> users = userRepository.searchUsersByNameAndEmail(search);
+            responseObject.prepareHttpStatus(HttpStatus.OK);
+            responseObject.setData(users);
+            return responseObject;
+        } catch (Exception e) {
+            return responseObject;
+        }
+
+    }
 }
