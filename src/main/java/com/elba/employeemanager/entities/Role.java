@@ -4,10 +4,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+//TODO UNNECESSARY
 @Getter
 @Setter
 @Entity
-@Table(name = "user_details")
+@Table(name = "roles")
 public class Role {
 
     @Id
@@ -15,6 +16,7 @@ public class Role {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column(name = "role_name")
     private String name;
 
 }

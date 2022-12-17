@@ -22,10 +22,6 @@ public class Department {
     @Column(name = "department_phone_number")
     private String departmentPhoneNumber;
 
-    @Column(name = "department_type")
-    @Enumerated(EnumType.STRING)
-    private DepartmentType departmentType;
-
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User departmentLeader;
