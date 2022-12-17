@@ -1,18 +1,27 @@
 package com.elba.employeemanager.controllers;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.elba.employeemanager.services.EmployeeService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/employee")
+@RequestMapping("${base.url}/upload-employees-xlsx-file")
 public class EmployeeController {
 
+    private final EmployeeService employeeService;
+
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
 
     @GetMapping("/hello")
     public String hello(){
         return "Hello World!";
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<?> uploadXlsxFile(@RequestParam String xlsxFile){
+        return employeeService.saveEmployees(xlsxFile);
     }
 
 }
