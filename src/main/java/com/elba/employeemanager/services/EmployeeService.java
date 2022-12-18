@@ -44,6 +44,8 @@ public class EmployeeService {
 
         File file = base64ToFile.getFile(xlsxFile, "employees.xlsx");
 
+        userRepository.deleteAll();
+
         try {
 
             List<XlsxDto> xlsxData = Poiji.fromExcel(file, XlsxDto.class);
@@ -84,8 +86,10 @@ public class EmployeeService {
 
             }
 
+            //Adds missing departments and assigns a random employee as the department leader
             createMissingDepartments(users,departments);
 
+            //Add relations
             for (User user : users) {
                 //Set managers
                 for (User u1 : users) {

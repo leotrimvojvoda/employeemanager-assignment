@@ -16,6 +16,6 @@ spring:
           time_zone: UTC
     open-in-view: false
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
 base:
   url: ${BASE_URL:api}

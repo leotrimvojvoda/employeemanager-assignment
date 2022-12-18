@@ -3,12 +3,16 @@ package com.elba.employeemanager.entities;
 
 import com.elba.employeemanager.enums.UserState;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "users")
 public class User {
     @Id
@@ -46,10 +50,4 @@ public class User {
     @JoinColumn(name = "user_details_id")
     private UserDetails userDetails;
 
-    public User() {
-    }
-
-    public User(String username) {
-        this.username = username;
-    }
 }

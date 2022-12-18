@@ -29,7 +29,7 @@ public class Department {
     @Transient
     private String departmentLeaderName;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "department_leader_id")
     private User departmentLeader;
 
