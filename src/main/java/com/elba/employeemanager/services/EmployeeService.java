@@ -3,6 +3,7 @@ package com.elba.employeemanager.services;
 import com.elba.employeemanager.common.Base64ToFile;
 import com.elba.employeemanager.common.DateUtilities;
 import com.elba.employeemanager.common.ResponseObject;
+import com.elba.employeemanager.common.Utilities;
 import com.elba.employeemanager.entities.Address;
 import com.elba.employeemanager.entities.Department;
 import com.elba.employeemanager.entities.User;
@@ -20,6 +21,7 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
@@ -28,11 +30,14 @@ public class EmployeeService {
     private final UserRepository userRepository;
     private final DateUtilities dateUtilities;
 
+    private final Utilities utilities;
+
     public EmployeeService(Base64ToFile base64ToFile, UserRepository userRepository,
-                           DateUtilities dateUtilities) {
+                           DateUtilities dateUtilities, Utilities utilities) {
         this.base64ToFile = base64ToFile;
         this.userRepository = userRepository;
         this.dateUtilities = dateUtilities;
+        this.utilities = utilities;
     }
 
     public ResponseEntity<?> saveEmployees(String xlsxFile) {
@@ -44,6 +49,7 @@ public class EmployeeService {
             List<XlsxDto> xlsxData = Poiji.fromExcel(file, XlsxDto.class);
 
             List<User> users = new ArrayList<>();
+            List<Department> departments = new ArrayList<>();
 
             for (XlsxDto employee : xlsxData) {
                 User user = new User();
@@ -51,6 +57,11 @@ public class EmployeeService {
                 user.setLastName(employee.getFullName().split(" ")[1]);
                 user.setEmail(employee.getEmail());
                 user.setUsername(employee.getUsername());
+                user.setManagerUserName(employee.getManager());
+                user.setDepartmentName(employee.getDepartment());
+                if (dateUtilities.getDate(employee.getEndDate()).isBefore(LocalDate.now()))
+                    user.setState(UserState.INACTIVE);
+                users.add(user);
 
                 UserDetails userDetails = new UserDetails();
                 userDetails.setPhoneNumber(employee.getPhoneNumber());
@@ -60,20 +71,40 @@ public class EmployeeService {
                 Address address = new Address();
                 address.setCity(employee.getAddress().split(",")[0]);
                 address.setStreet(employee.getAddress().split(",")[1]);
-
-                Department department = new Department();
-                department.setDepartmentLeader(user);
-                department.setDepartmentName(employee.getDepartmentName());
-                department.setDepartmentPhoneNumber(employee.getDepartmentPhone());
-
-                if (dateUtilities.getDate(employee.getEndDate()).isBefore(LocalDate.now()))
-                    user.setState(UserState.INACTIVE);
-
                 userDetails.setAddress(address);
-                userDetails.setDepartment(department);
+
+                if (employee.getDepartmentName() != null) {
+                    Department department = new Department();
+                    department.setDepartmentName(employee.getDepartmentName());
+                    department.setDepartmentPhoneNumber(employee.getDepartmentPhone());
+                    department.setDepartmentLeaderName(employee.getDepartmentLeader());
+                    departments.add(department);
+                }
                 user.setUserDetails(userDetails);
 
-                users.add(user);
+            }
+
+            createMissingDepartments(users,departments);
+
+            for (User user : users) {
+                //Set managers
+                for (User u1 : users) {
+                    if (user.getManagerUserName() != null && u1.getUsername() != null &&
+                            user.getManagerUserName().equals(u1.getUsername())) {
+                        user.setManager(u1);
+                        user.setManagerUserName(u1.getUsername());
+                    }
+                }
+                //Set departments
+                for (Department department : departments) {
+                    if (department.getDepartmentLeaderName() != null && department.getDepartmentLeaderName().equals(user.getUsername()))
+                        department.setDepartmentLeader(user);
+
+                    if (user.getDepartmentName().equals(department.getDepartmentName())) {
+                        user.getUserDetails().setDepartment(department);
+                    }
+                }
+
             }
 
             userRepository.saveAll(users);
@@ -86,6 +117,17 @@ public class EmployeeService {
             if (file.exists()) file.delete();
         }
         return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
+    private void createMissingDepartments(List<User> users, List<Department> departments) {
+        List<String> missingDepartments =
+                new ArrayList<>(users.stream().collect(Collectors.groupingBy(User::getDepartmentName)).keySet().stream().sorted().toList());
+
+        missingDepartments.removeAll(departments.stream().map(Department::getDepartmentName).sorted().toList());
+
+        missingDepartments.forEach(departmentName ->
+                departments.add(new Department(departmentName, users.get(utilities.getRandomNumber(0, users.size())))));
 
     }
 
@@ -104,4 +146,7 @@ public class EmployeeService {
         }
 
     }
+
+
+
 }

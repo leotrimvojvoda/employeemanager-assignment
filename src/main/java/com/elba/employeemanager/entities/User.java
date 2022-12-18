@@ -32,16 +32,24 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserState state = UserState.ACTIVE;
 
-//    @ManyToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "role_id")
-//    private Role role;
+    @Transient
+    private String managerUserName;
+
+    @Transient
+    private String departmentName;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "manager_id")
     private User manager;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_details_id")
     private UserDetails userDetails;
 
+    public User() {
+    }
+
+    public User(String username) {
+        this.username = username;
+    }
 }
