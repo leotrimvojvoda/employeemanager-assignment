@@ -45,5 +45,4 @@ public class XlsxDto {
 
     @ExcelCell(13)
     private String departmentPhone;
-
 }

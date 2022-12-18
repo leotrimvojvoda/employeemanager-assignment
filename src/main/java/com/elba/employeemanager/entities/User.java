@@ -3,12 +3,16 @@ package com.elba.employeemanager.entities;
 
 import com.elba.employeemanager.enums.UserState;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "users")
 public class User {
     @Id
@@ -32,9 +36,15 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserState state = UserState.ACTIVE;
 
-//    @ManyToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "role_id")
-//    private Role role;
+    @Transient
+    private String managerUserName;
+
+    @Transient
+    private String departmentName;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "manager_id")
+    private User manager;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_details_id")
