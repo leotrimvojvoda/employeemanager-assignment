@@ -5,12 +5,12 @@
 * Map data to POJO-s
 * Create entity relations
     - Created tables for: User, UserDetails, Address, Department
-* Fill missing data*
+* Fill missing data
+    - Some users had departments that were not in the department list, so I found the departments that were not in the departments list, assigned a random user as department leader and saved them in the database.
 * Store data in the database
 * Bonus task:
     - Assume that the employees.xlsx gets reimported daily with respective updates (new users added, existing users removed, values for existing users changed). Rework your import logic to respect these changes and update the database accordingly on every import.
     - As of my understanding the exact same copy of the xlsx file is to be made every time that file gets re-imported, instead of comparing each field in the database and checking it for differences, I decided to rewrite all the data on every file update.
-
 ### How to test:
 * Create a postgresql database with the name: 'employeemanager'
     - Change the postgresql username and password in the application.yml file default(usr: postgres, pwd: root)
