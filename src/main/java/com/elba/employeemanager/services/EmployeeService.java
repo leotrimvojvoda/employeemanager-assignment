@@ -165,7 +165,6 @@ public class EmployeeService {
         ResponseObject<ActiveAndInactiveUsers> responseObject = new ResponseObject<>();
         responseObject.prepareHttpStatus(HttpStatus.OK);
 
-
         List<ViewUser> activeUsers = userRepository.findUsersByState(UserState.ACTIVE);
         List<ViewUser> inactiveUsers = userRepository.findUsersByState(UserState.INACTIVE);
 
