@@ -1,16 +1,6 @@
 # Employee Manager
 
-### How to test:
-* Create a postgresql database with the name: 'employeemanager'
-    - Change the postgresql username and password in the application.yml file default(usr: postgres, pwd: root)
-* Run the application, hibernate will generate all tables with the necessary relations, no table scripts are needed.
-* In this GitHub repository you'll find a postman collection that you can open using postman and call the endpoints.
-    - In your postman environment create a variable 'host' with value of 'http://localhost:8080' or replace the {{host}} with http://localhost:8080 in the url section in postman. 
-
 ### Api basic functionality:
-#### Read data from an Excel file, store it in the database and query it.
-
-### Features
 * Read an Excel document
 * Map data to POJO-s
 * Create entity relations
@@ -20,6 +10,13 @@
 * Bonus task:
     - Assume that the employees.xlsx gets reimported daily with respective updates (new users added, existing users removed, values for existing users changed). Rework your import logic to respect these changes and update the database accordingly on every import.
     - As of my understanding the exact same copy of the xlsx file is to be made every time that file gets re-imported, instead of comparing each field in the database and checking it for differences, I decided to rewrite all the data on every file update.
+
+### How to test:
+* Create a postgresql database with the name: 'employeemanager'
+    - Change the postgresql username and password in the application.yml file default(usr: postgres, pwd: root)
+* Run the application, hibernate will generate all tables with the necessary relations, no table scripts are needed.
+* In this GitHub repository you'll find a postman collection that you can open using postman and call the endpoints.
+    - In your postman environment create a variable 'host' with value of 'http://localhost:8080' or replace the {{host}} with http://localhost:8080 in the url section in postman.
 
 ### Endpoints
 * Upload File
