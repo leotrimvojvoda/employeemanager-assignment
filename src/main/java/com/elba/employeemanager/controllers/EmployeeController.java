@@ -2,6 +2,7 @@ package com.elba.employeemanager.controllers;
 
 import com.elba.employeemanager.common.ResponseObject;
 import com.elba.employeemanager.models.ActiveAndInactiveUsers;
+import com.elba.employeemanager.models.GroupByDepartment;
 import com.elba.employeemanager.models.ViewUser;
 import com.elba.employeemanager.services.EmployeeService;
 import org.springframework.http.HttpStatus;
@@ -21,17 +22,17 @@ public class EmployeeController {
     }
 
     @GetMapping("/hello")
-    public String hello(){
+    public String hello() {
         return "Hello World!";
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadXlsxFile(@RequestParam String xlsxFile){
+    public ResponseEntity<?> uploadXlsxFile(@RequestParam String xlsxFile) {
         return employeeService.saveEmployees(xlsxFile);
     }
 
     @GetMapping("/search/{search}")
-    public ResponseEntity<?> search(@PathVariable String search){
+    public ResponseEntity<?> search(@PathVariable String search) {
 
         ResponseObject<List<ViewUser>> responseObject = employeeService.search(search);
 
@@ -39,7 +40,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/active-inactive")
-    public ResponseEntity<?> getActiveAndInactiveUsers(){
+    public ResponseEntity<?> getActiveAndInactiveUsers() {
 
         ResponseObject<ActiveAndInactiveUsers> responseObject = employeeService.getActiveAndInactiveUsers();
 
@@ -47,7 +48,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/users-asc-order")
-    public ResponseEntity<?> getUsersAscending(){
+    public ResponseEntity<?> getUsersAscending() {
 
         ResponseObject<List<ViewUser>> responseObject = employeeService.findUsersInAscendingOrder();
 
@@ -55,13 +56,11 @@ public class EmployeeController {
     }
 
     @GetMapping("/grouped-by-department")
-    public ResponseEntity<?> getUsersByDepartment(){
+    public ResponseEntity<?> getUsersByDepartment() {
 
-        employeeService.findGroupedUsersByDepartment();
+        ResponseObject<List<GroupByDepartment>> responseObject = employeeService.findGroupedUsersByDepartment();
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.status(responseObject.getStatus()).body(responseObject);
     }
-
-
 
 }

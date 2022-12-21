@@ -2,6 +2,7 @@ package com.elba.employeemanager.repositories;
 
 import com.elba.employeemanager.entities.User;
 import com.elba.employeemanager.enums.UserState;
+import com.elba.employeemanager.models.GroupByDepartment;
 import com.elba.employeemanager.models.ViewUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -71,5 +72,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
             " JOIN Department d on ud.department.id = d.id" +
             " ORDER BY concat(u.firstName, ' ',u.lastName) ")
     List<ViewUser> getUsersAscOrder();
+
+    @Query("SELECT new com.elba.employeemanager.models.GroupByDepartment(" +
+            " u.lastName, " +
+            " d.departmentName )" +
+            " FROM User u" +
+            " JOIN UserDetails ud on u.userDetails.id = ud.id" +
+            " JOIN Department d on ud.department.id = d.id")
+    List<GroupByDepartment> getUsersGroupByDepartment();
 
 }

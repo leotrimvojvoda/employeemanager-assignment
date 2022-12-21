@@ -10,20 +10,22 @@ import com.elba.employeemanager.entities.User;
 import com.elba.employeemanager.entities.UserDetails;
 import com.elba.employeemanager.enums.UserState;
 import com.elba.employeemanager.models.ActiveAndInactiveUsers;
+import com.elba.employeemanager.models.GroupByDepartment;
 import com.elba.employeemanager.models.ViewUser;
 import com.elba.employeemanager.models.XlsxDto;
+import com.elba.employeemanager.repositories.UserDetailsRepository;
 import com.elba.employeemanager.repositories.UserRepository;
 import com.poiji.bind.Poiji;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.View;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,13 +36,16 @@ public class EmployeeService {
     private final DateUtilities dateUtilities;
 
     private final Utilities utilities;
+    private final UserDetailsRepository userDetailsRepository;
 
     public EmployeeService(Base64ToFile base64ToFile, UserRepository userRepository,
-                           DateUtilities dateUtilities, Utilities utilities) {
+                           DateUtilities dateUtilities, Utilities utilities,
+                           UserDetailsRepository userDetailsRepository) {
         this.base64ToFile = base64ToFile;
         this.userRepository = userRepository;
         this.dateUtilities = dateUtilities;
         this.utilities = utilities;
+        this.userDetailsRepository = userDetailsRepository;
     }
 
     public ResponseEntity<?> saveEmployees(String xlsxFile) {
@@ -155,7 +160,6 @@ public class EmployeeService {
 
     }
 
-
     public ResponseObject<ActiveAndInactiveUsers> getActiveAndInactiveUsers(){
 
         ResponseObject<ActiveAndInactiveUsers> responseObject = new ResponseObject<>();
@@ -176,7 +180,6 @@ public class EmployeeService {
         return responseObject;
     }
 
-
     public ResponseObject<List<ViewUser>> findUsersInAscendingOrder() {
 
         ResponseObject<List<ViewUser>> responseObject = new ResponseObject<>();
@@ -191,19 +194,30 @@ public class EmployeeService {
 
     }
 
-    public void findGroupedUsersByDepartment(){
-        ResponseObject<List<ViewUser>> responseObject = new ResponseObject<>();
+    public ResponseObject<List<GroupByDepartment>> findGroupedUsersByDepartment(){
+        ResponseObject<List<GroupByDepartment>> responseObject = new ResponseObject<>();
         responseObject.prepareHttpStatus(HttpStatus.OK);
 
-        List<ViewUser> usersInAscOrder = userRepository.getUsersAscOrder();
+        List<GroupByDepartment> usersInAscOrder = userRepository.getUsersGroupByDepartment();
 
-        Map<String, List<ViewUser>> usersByDepartment = usersInAscOrder.stream()
-                .collect(Collectors.groupingBy(ViewUser::getDepartmentName));
+        Map<String, List<String>> usersByDepartment = usersInAscOrder.stream()
+                .collect(Collectors.groupingBy(
+                        GroupByDepartment::getEmployeesLastName,
+                        TreeMap::new,
+                        Collectors.mapping(GroupByDepartment::getDepartment, Collectors.toList())));
 
-        System.out.println("Hi");
+        List<GroupByDepartment> groupByDepartments = new ArrayList<>();
+
+        for(String department : usersByDepartment.keySet()){
+            GroupByDepartment groupByDepartment = new GroupByDepartment();
+            groupByDepartment.setDepartment(department);
+            groupByDepartment.setEmployeeLastNamesList(usersByDepartment.get(department));
+            groupByDepartments.add(groupByDepartment);
+        }
+
+        if(!groupByDepartments.isEmpty()) responseObject.setData(groupByDepartments);
+        else responseObject.prepareHttpStatus(HttpStatus.NO_CONTENT);
+
+        return responseObject;
     }
-
-
-
-
 }
