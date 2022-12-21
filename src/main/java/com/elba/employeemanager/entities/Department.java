@@ -1,6 +1,5 @@
 package com.elba.employeemanager.entities;
 
-import com.elba.employeemanager.enums.DepartmentType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
