@@ -49,4 +49,19 @@ public class ViewUser {
         this.departmentLeader = departmentLeader;
         this.departmentPhone = departmentPhone;
     }
+
+    public ViewUser(String fullName, String username, String email, String phoneNumber, String address, LocalDate startDate, LocalDate endDate, String departmentName, String departmentLeader, String departmentPhone) {
+        this.fullName = fullName;
+        this.username = username;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.departmentName = departmentName;
+        this.departmentLeader = departmentLeader;
+        this.departmentPhone = departmentPhone;
+    }
+
+
 }

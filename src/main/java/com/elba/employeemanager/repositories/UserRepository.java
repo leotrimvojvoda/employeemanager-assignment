@@ -37,7 +37,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT new com.elba.employeemanager.models.ViewUser(" +
             " concat(u.firstName,'', u.lastName) ," +
-            " concat(u.manager.firstName, ' ', u.manager.lastName), " +
             " u.username, " +
             " u.email, " +
             " ud.phoneNumber," +
